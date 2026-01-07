@@ -1,6 +1,6 @@
 {
-  "name": "@adobe/structured-data-validator",
-  "version": "1.5.0",
+  "name": "@gsriram24/structured-data-validator",
+  "version": "1.6.0",
   "publishConfig": {
     "access": "public"
   },
@@ -24,10 +24,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/adobe/structured-data-validator.git"
+    "url": "git+https://github.com/gsriram24/structured-data-validator.git"
   },
   "bugs": {
-    "url": "https://github.com/adobe/structured-data-validator/issues"
+    "url": "https://github.com/gsriram24/structured-data-validator/issues"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
