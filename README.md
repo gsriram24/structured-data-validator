@@ -1,33 +1,83 @@
-# @adobe/structured-data-validator
+# @gsriram24/structured-data-validator
 
-![GitHub License](https://img.shields.io/github/license/adobe/structured-data-validator)
-[![CI](https://github.com/adobe/structured-data-validator/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/adobe/structured-data-validator/actions/workflows/ci.yml)
-[![NPM Version](https://img.shields.io/npm/v/%40adobe%2Fstructured-data-validator?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40adobe%2Fstructured-data-validator)](https://www.npmjs.com/package/@adobe/structured-data-validator)
-![Node Current](https://img.shields.io/node/v/%40adobe%2Fstructured-data-validator)
+> **Fork of [@adobe/structured-data-validator](https://github.com/adobe/structured-data-validator)** with additional features.
 
-A JavaScript library for validating and parsing structured data according to Schema.org specifications and Google Rich Results requirements. This library ensures your structured data meets both Schema.org standards and Google's specific requirements for rich results, helping to optimize your content for search engines and other platforms.
+[![NPM Version](https://img.shields.io/npm/v/%40gsriram24%2Fstructured-data-validator)](https://www.npmjs.com/package/@gsriram24/structured-data-validator)
+![Node Current](https://img.shields.io/node/v/%40gsriram24%2Fstructured-data-validator)
 
-## Features
+A JavaScript library for validating and parsing structured data according to Schema.org specifications and Google Rich Results requirements.
 
-- Validates structured data against both Schema.org and Google Rich Results specifications
-- Ensures compliance with Google's structured data guidelines
-- Extensible validation system with custom type handlers
+## Additional Features in This Fork
+
+This fork adds the following features on top of Adobe's original library:
+
+### 1. `fieldName` Property on Validation Errors
+Every validation error now includes a `fieldName` property for precise programmatic access:
+
+```javascript
+// Before (Adobe's version) - requires string parsing
+{
+  issueMessage: 'Required attribute "price" is missing',
+  severity: 'ERROR',
+  path: [...]
+}
+
+// After (this fork) - direct field access
+{
+  issueMessage: 'Required attribute "price" is missing',
+  severity: 'ERROR',
+  path: [...],
+  fieldName: 'price'  // ✨ New!
+}
+```
+
+For `or()` conditions, both `fieldName` and `fieldNames` are provided:
+```javascript
+{
+  issueMessage: 'One of the following attributes is required...',
+  fieldName: 'aggregateRating',           // First field
+  fieldNames: ['aggregateRating', 'offers', 'review']  // All fields
+}
+```
+
+### 2. New Validators for Common Schema Types
+Added validators for commonly-used schema.org types:
+
+| Type | Required Fields | 
+|------|-----------------|
+| `LocalBusiness` | `name`, `address` |
+| `Article` | `headline` |
+| `Event` | `name`, `startDate`, `location` (or online mode) |
+| `FAQPage` | `mainEntity` |
+| `HowTo` | `name`, `step` |
+| `WebSite` | `name`, `url` |
+
+### 3. Automatic Subtype Inheritance
+Subtypes automatically inherit validation from parent types:
+
+| Subtype | Inherits From |
+|---------|---------------|
+| `Restaurant`, `Store`, `Hotel`, `Dentist` | `LocalBusiness` |
+| `NewsArticle`, `BlogPosting`, `TechArticle` | `Article` |
+| `MusicEvent`, `SportsEvent`, `Festival` | `Event` |
+
+This enables validation of **100+ schema types** without individual validator files.
+
+---
 
 ## Installation
 
 ```bash
-npm install @adobe/structured-data-validator
+npm install @gsriram24/structured-data-validator
 ```
 
 ## Usage
 
-This library works in conjunction with [@marbec/web-auto-extractor](https://www.npmjs.com/package/@marbec/web-auto-extractor) to validate structured data extracted from web pages.
-
 ```javascript
-import { Validator } from '@adobe/structured-data-validator';
+import { Validator } from '@gsriram24/structured-data-validator';
 import WebAutoExtractor from '@marbec/web-auto-extractor';
 
-// First, extract structured data from HTML
+// Extract structured data from HTML
 const extractor = new WebAutoExtractor({ addLocation: true, embedSource: ['rdfa', 'microdata'] });
 const extractedData = extractor.parse(sampleHTML);
 
@@ -39,52 +89,60 @@ const validator = new Validator(schemaOrgJson);
 
 // Validate the extracted structured data
 const results = await validator.validate(extractedData);
-}
+
+// Use fieldName for precise error handling
+results.forEach(issue => {
+  if (issue.severity === 'ERROR') {
+    console.log(`Field "${issue.fieldName}" has error: ${issue.issueMessage}`);
+  }
+});
 ```
 
-The validator expects the output format from `@marbec/web-auto-extractor`, which includes:
-
-- JSON-LD structured data
-- Microdata
-- RDFa
-
 ### Browser
-
-You can run the parser and validator directly in the browser on any website using the following commands:
 
 ```js
 const { default: WebAutoExtractor } = await import(
   'https://unpkg.com/@marbec/web-auto-extractor@latest/dist/index.js'
 );
 const { default: Validator } = await import(
-  'https://unpkg.com/@adobe/structured-data-validator@latest/src/index.js'
+  'https://unpkg.com/@gsriram24/structured-data-validator@latest/src/index.js'
 );
 
 const extractedData = new WebAutoExtractor({
   addLocation: true,
   embedSource: ['rdfa', 'microdata'],
 }).parse(document.documentElement.outerHTML);
-console.log(extractedData);
+
 const schemaOrgJson = await (
   await fetch('https://schema.org/version/latest/schemaorg-all-https.jsonld')
 ).json();
-await new Validator(schemaOrgJson).validate(extractedData);
+
+const issues = await new Validator(schemaOrgJson).validate(extractedData);
+console.log(issues);
 ```
+
+## Upstream Contributions
+
+The features in this fork have been submitted as PRs to the upstream Adobe repository:
+- [PR #57: Add fieldName property](https://github.com/adobe/structured-data-validator/pull/57)
+- [PR #58: Add validators for common schema types](https://github.com/adobe/structured-data-validator/pull/58)
+
+Once merged upstream, consider switching back to `@adobe/structured-data-validator`.
 
 ## Development
 
 ### Prerequisites
 
-- Node.js (latest LTS version recommended)
+- Node.js (>=18.0.0)
 - npm
 
 ### Setup
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/gsriram24/structured-data-validator.git
+cd structured-data-validator
+npm install
+```
 
 ### Available Scripts
 
@@ -93,17 +151,10 @@ await new Validator(schemaOrgJson).validate(extractedData);
 - `npm run format` - Check code formatting
 - `npm run format:fix` - Fix code formatting issues
 
-### Debug Logging
+## License
 
-To enable debug logging and see detailed validation output, set the `debug` property to `true` on your `Validator` instance:
+Apache-2.0 (same as upstream)
 
-```js
-const validator = new Validator();
-validator.debug = true; // Enable debug logging
-```
+## Credits
 
-This will print additional information to the console during validation, which is useful for development and troubleshooting.
-
-## Dependencies
-
-- [@marbec/web-auto-extractor](https://www.npmjs.com/package/@marbec/web-auto-extractor) - For extracting structured data from web pages
+Original library by [Adobe](https://github.com/adobe/structured-data-validator).
