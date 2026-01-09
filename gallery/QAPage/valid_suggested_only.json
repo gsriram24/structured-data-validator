@@ -1,0 +1,24 @@
+{
+	"@context": "https://schema.org",
+	"@type": "QAPage",
+	"mainEntity": {
+		"@type": "Question",
+		"name": "What is the best JavaScript framework?",
+		"text": "I'm starting a new project and wondering which JS framework to use.",
+		"answerCount": 3,
+		"suggestedAnswer": [
+			{
+				"@type": "Answer",
+				"text": "React is great for large applications with complex state management."
+			},
+			{
+				"@type": "Answer",
+				"text": "Vue.js has a gentler learning curve and excellent documentation."
+			},
+			{
+				"@type": "Answer",
+				"text": "Svelte compiles to vanilla JS with minimal runtime overhead."
+			}
+		]
+	}
+}

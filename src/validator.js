@@ -33,6 +33,7 @@ export class Validator {
       Event: [() => import('./types/Event.js')],
       FAQPage: [() => import('./types/FAQPage.js')],
       HowTo: [() => import('./types/HowTo.js')],
+      QAPage: [() => import('./types/QAPage.js')],
       ImageObject: [() => import('./types/ImageObject.js')],
       VideoObject: [() => import('./types/VideoObject.js')],
       Clip: [() => import('./types/Clip.js')],

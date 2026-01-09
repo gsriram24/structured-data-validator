@@ -11,15 +11,11 @@
  */
 import BaseValidator from './base.js';
 
-export default class QuestionValidator extends BaseValidator {
+export default class QAPageValidator extends BaseValidator {
   getConditions() {
     return [
-      this.required('name'),
-      this.or(
-        this.required('acceptedAnswer', 'arrayOrObject'),
-        this.required('suggestedAnswer', 'arrayOrObject'),
-      ),
-      this.recommended('text'),
+      this.required('mainEntity', 'object'),
+      this.required('mainEntity.answerCount', 'number'),
     ].map((c) => c.bind(this));
   }
 }
