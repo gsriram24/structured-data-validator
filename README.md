@@ -11,8 +11,8 @@ A JavaScript library for validating and parsing structured data according to Sch
 
 This fork adds the following features on top of Adobe's original library:
 
-### 1. `fieldName` Property on Validation Errors
-Every validation error now includes a `fieldName` property for precise programmatic access:
+### 1. `fieldNames` Property on Validation Errors
+Every validation error now includes a `fieldNames` array for precise programmatic access:
 
 ```javascript
 // Before (Adobe's version) - requires string parsing
@@ -27,18 +27,19 @@ Every validation error now includes a `fieldName` property for precise programma
   issueMessage: 'Required attribute "price" is missing',
   severity: 'ERROR',
   path: [...],
-  fieldName: 'price'  // ✨ New!
+  fieldNames: ['price']  // ✨ New!
 }
 ```
 
-For `or()` conditions, both `fieldName` and `fieldNames` are provided:
+For `or()` conditions with multiple fields:
 ```javascript
 {
   issueMessage: 'One of the following attributes is required...',
-  fieldName: 'aggregateRating',           // First field
-  fieldNames: ['aggregateRating', 'offers', 'review']  // All fields
+  fieldNames: ['aggregateRating', 'offers', 'review']  // All relevant fields
 }
 ```
+
+Access the primary field with `error.fieldNames[0]}`, or iterate over all fields as needed.
 
 ### 2. New Validators for Common Schema Types
 Added validators for commonly-used schema.org types:
@@ -90,10 +91,10 @@ const validator = new Validator(schemaOrgJson);
 // Validate the extracted structured data
 const results = await validator.validate(extractedData);
 
-// Use fieldName for precise error handling
+// Use fieldNames for precise error handling
 results.forEach(issue => {
   if (issue.severity === 'ERROR') {
-    console.log(`Field "${issue.fieldName}" has error: ${issue.issueMessage}`);
+    console.log(`Field "${issue.fieldNames?.[0]}" has error: ${issue.issueMessage}`);
   }
 });
 ```
