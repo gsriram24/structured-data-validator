@@ -60,5 +60,44 @@ describe("LocalBusinessValidator", () => {
 				issueMessage: 'Required attribute "address" is missing',
 			});
 		});
+
+		it("should accept image as an ImageObject", async () => {
+			const data = await loadTestData(
+				"LocalBusiness/valid_image_object.json",
+				"jsonld"
+			);
+			const issues = await validator.validate(data);
+			expect(issues.filter(i => i.severity === "ERROR")).to.have.lengthOf(0);
+			expect(issues.map(i => i.issueMessage)).to.not.include(
+				'Invalid type for attribute "image"'
+			);
+		});
+
+		it("should accept image as an array mixing ImageObject and URL", async () => {
+			const data = await loadTestData(
+				"LocalBusiness/valid_image_mixed_array.json",
+				"jsonld"
+			);
+			const issues = await validator.validate(data);
+			expect(issues.filter(i => i.severity === "ERROR")).to.have.lengthOf(0);
+			expect(issues.map(i => i.issueMessage)).to.not.include(
+				'Invalid type for attribute "image"'
+			);
+		});
+
+		it("should warn instead of throwing when image is not a URL", async () => {
+			const data = await loadTestData(
+				"LocalBusiness/invalid_image_number.json",
+				"jsonld"
+			);
+			const issues = await validator.validate(data);
+			const imageIssue = issues.find(
+				i => i.issueMessage === 'Invalid type for attribute "image"'
+			);
+			expect(imageIssue).to.deep.include({
+				severity: "WARNING",
+				fieldNames: ["image"],
+			});
+		});
 	});
 });
